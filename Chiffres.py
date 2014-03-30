@@ -8,60 +8,56 @@ import sys
 sys.path.append('/Users/simongoffin/Desktop/MAIN/Outils/Python files/Puzzle/aima-python')
 from search import *
 
-class PuzzleProblem(Problem):
+class ChiffresProblem(Problem):
 
     def __init__(self,init,goal):
-        goal1 = re.compile(goal)
-        Problem.__init__(self, init, goal1)
+        Problem.__init__(self, init, goal)
 
     
     def goal_test(self, state):
-        return self.goal.search(state) != None
-
-    mapping = string.maketrans('345789','222666')
-    dico={}
-    #dico[self.initial.translate(self.mapping)]=1
-    
-    def canonical(self, state):
-        canonical_state=state.translate(self.mapping)
-        return canonical_state
-
-    invalidpos = { (0,-4):None, (1,-4):None, (2,-4):None, (3,-4):None,
-              (16,4):None, (17,4):None, (18,4):None, (19,4):None,
-              (0,-1):None, (4,-1):None, (8,-1):None, (12,-1):None, (16,-1):None,
-              (3,1):None, (7,1):None, (11,1):None, (15,1):None, (19,1):None, }
+        for result in state:
+            if result==goal:
+                return True
+        return False
+        
+    def possible(valeur1,valeur2,operation):
+        #1==+
+        if operation==1:
+            return [True,valeur1+valeur2]
+        #2==-
+        elif operation==2:
+            return [valeur1-valeur2>0,valeur1-valeur2]
+        #3==*
+        elif operation==3:
+            return [True,valeur1*valeur2]
+        #4==/
+        elif operation==4:
+            return [valeur1%valeur2==0,valeur1/valeur2]
+            
                  
     def successor(self, state):
-        pos1 = state.find('0')
-        pos2 = state.find('0',pos1+1)
-        l = []
-        for pos in [pos1, pos2]:
-            for sw in [-4,-1,1,4]:
-                if (pos,sw) in self.invalidpos: continue
-                square = state[pos+sw]
-                if square == '0': continue
-                newmove = state.replace(square, '0')
-                for i in range(20):
-                    if 0 <= i+sw < 20 and state[i+sw]==square:
-                        newmove = newmove[:i] + square + newmove[i+1:]
-                if newmove.count('0') != 2: continue
-                symetrie=newmove.translate(self.mapping)
-                if symetrie not in self.dico:
-                    self.dico[symetrie]=1
-                    yield (sw, newmove)
-                else: continue
+        for valeur1 in state:
+            temp=state[0][:]
+            temp.remove(temp.index(valeur1))
+            for valeur2 in temp:
+                for operation in [1,2,3,4]:
+                    check=possible(valeur1,valeur2,operation)
+                    if check[0]:
+                        newmove=temp[:]
+                        newmove.remove(newmove.index(valeur2))
+                        newmove.append(check[1])
+                        yield (operation,newmove)
+                    else: continue
 
-def formatstate(stri):
+def formatstate(list):
     out = '\n'
-    #pos = stri.replace( '0', '.' )
-    for i in [0,4,8,12,16]:
-        for x in range(i,i+4):
-            out = out + stri[x] + ' '
-        out = out + '\n'
+    for i in list:
+        out = out + list[i] + ' '
+    out = '\n'
     return out
 
 if __name__ == "__main__":    
-    problem=PuzzleProblem('211321130AA046754895','.................11.')
+    problem=PuzzleProblem([1,2,3,4],10)
     #example of bfs search
     node=breadth_first_graph_search(problem)
     #example of print
