@@ -5,7 +5,7 @@ import re
 import string
 import sys
 
-sys.path.append('/Users/simongoffin/Desktop/MAIN/Outils/Python files/Puzzle/aima-python')
+sys.path.append('/Users/simongoffin/Desktop/BOX/MAIN/Outils/Python files/Puzzle/aima-python')
 from search import *
 
 class ChiffresProblem(Problem):
@@ -16,7 +16,7 @@ class ChiffresProblem(Problem):
     
     def goal_test(self, state):
         for result in state:
-            if result==goal:
+            if result==self.goal:
                 return True
         return False
         
@@ -57,7 +57,7 @@ def formatstate(list):
     return out
 
 if __name__ == "__main__":    
-    problem=PuzzleProblem([1,2,3,4],10)
+    problem=ChiffresProblem([1,2,3,4],10)
     #example of bfs search
     node=breadth_first_graph_search(problem)
     #example of print
