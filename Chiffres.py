@@ -19,53 +19,44 @@ class ChiffresProblem(Problem):
             if result==self.goal:
                 return True
         return False
-        
-    def possible(valeur1,valeur2,operation):
-        #1==+
-        if operation==1:
-            return [True,valeur1+valeur2]
-        #2==-
-        elif operation==2:
-            return [valeur1-valeur2>0,valeur1-valeur2]
-        #3==*
-        elif operation==3:
-            return [True,valeur1*valeur2]
-        #4==/
-        elif operation==4:
-            return [valeur1%valeur2==0,valeur1/valeur2]
             
-                 
     def successor(self, state):
         for valeur1 in state:
-            temp=state[0][:]
-            temp.remove(temp.index(valeur1))
+            temp=state[:]
+            temp=temp[0:temp.index(valeur1)]+temp[temp.index(valeur1)+1:len(temp)]
             for valeur2 in temp:
                 for operation in [1,2,3,4]:
                     check=possible(valeur1,valeur2,operation)
                     if check[0]:
                         newmove=temp[:]
-                        newmove.remove(newmove.index(valeur2))
-                        newmove.append(check[1])
+                        newmove=newmove[0:newmove.index(valeur2)]+newmove[newmove.index(valeur2)+1:len(newmove)]
+                        newmove=newmove+(check[1],)
+                        #print newmove
                         yield (operation,newmove)
                     else: continue
-
-def formatstate(list):
-    out = '\n'
-    for i in list:
-        out = out + list[i] + ' '
-    out = '\n'
-    return out
+                    
+def possible(valeur1,valeur2,operation):
+    #1==+
+    if operation==1:
+        return [True,valeur1+valeur2]
+    #2==-
+    elif operation==2:
+        return [valeur1-valeur2>0,valeur1-valeur2]
+    #3==*
+    elif operation==3:
+        return [True,valeur1*valeur2]
+    #4==/
+    elif operation==4:
+        return [valeur1%valeur2==0,valeur1/valeur2]
 
 if __name__ == "__main__":    
-    problem=ChiffresProblem([1,2,3,4],10)
+    problem=ChiffresProblem((1,2,3,4),10)
     #example of bfs search
     node=breadth_first_graph_search(problem)
     #example of print
     print(node)
     path=node.path()
     path.reverse()
-    i=0
     for n in path:
-        print(formatstate(n.state))
-        i+=1
-    print(i)
+        print(n.state)
+        
